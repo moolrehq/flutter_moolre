@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="flutter_moolre_example"
         android:name="${applicationName}"
@@ -17,14 +18,6 @@
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
-
-            <!-- Deep link intent-filter should be inside the activity -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="moolre" android:host="payment-callback"/>
-            </intent-filter>
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

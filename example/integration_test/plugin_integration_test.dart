@@ -1,24 +1,48 @@
-// // This is a basic Flutter integration test.
-// //
-// // Since integration tests run in a full Flutter application, they can interact
-// // with the host side of a plugin implementation, unlike Dart unit tests.
-// //
-// // For more information about Flutter integration tests, please see
-// // https://flutter.dev/to/integration-testing
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+import 'package:flutter_moolre/flutter_moolre.dart';
+import 'package:flutter_moolre_example/payment_configuration.dart';
+import 'package:flutter_moolre_example/payment_storage.dart';
+import 'package:uuid/uuid.dart';
 
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:integration_test/integration_test.dart';
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  const enabled = bool.fromEnvironment('RUN_MOOLRE_SANDBOX_TEST');
+  const config = PaymentConfiguration.fromEnvironment();
 
-// import 'package:flutter_moolre/flutter_moolre.dart';
-
-// void main() {
-//   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-//   testWidgets('getPlatformVersion test', (WidgetTester tester) async {
-//     final FlutterMoolre plugin = FlutterMoolre();
-//     final String? version = await plugin.getPlatformVersion();
-//     // The version string depends on the host platform running the test, so
-//     // just assert that some non-empty string is returned.
-//     expect(version?.isNotEmpty, true);
-//   });
-// }
+  // The hosted page itself runs in a native WebView, outside Flutter's reach,
+  // so this checks the real link creation and status lookup it depends on.
+  testWidgets(
+    'real Moolre sandbox creates a hosted payment page',
+    (tester) async {
+      expect(config.problems(MoolreEnvironment.sandbox), isEmpty);
+      final orderId = const Uuid().v4();
+      final gateway = MoolreDirectPaymentGateway(
+        apiUser: config.apiUser,
+        accountNumber: config.accountNumber,
+        publicKey: config.publicKey,
+        merchantEmail: config.merchantEmail,
+        environment: MoolreEnvironment.sandbox,
+        orderId: orderId,
+        amountMinor: 70,
+        storage: await FilePaymentStorage.open(),
+      );
+      addTearDown(gateway.close);
+      final session = await gateway.createSession(
+        orderId: orderId,
+        idempotencyKey: const Uuid().v4(),
+      );
+      final started = await gateway.startHostedCheckout(session.id);
+      expect(
+        started.url,
+        isNotNull,
+        reason: started.session.message ?? 'No sandbox payment page returned.',
+      );
+      expect(started.url!.host, endsWith('moolre.com'));
+      final checked = await gateway.getSession(session.id);
+      expect(checked.isSuccessful, isFalse);
+    },
+    skip: !enabled,
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
+}

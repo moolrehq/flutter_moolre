@@ -1,3 +1,12 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.example.flutter_moolre">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <activity
+            android:name="com.moolre.flutter_moolre.MoolreCheckoutActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|uiMode"
+            android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
 </manifest>

@@ -1,0 +1,32 @@
+# Keep the archive focused on the SDK, example, tests, and integration docs.
+/.git/
+/.github/
+/.metadata
+/.idea/
+/.vscode/
+/.dart_tool/
+/build/
+# Native plugin code (android/src, ios/Classes) must ship; skip only generated files.
+/android/app/
+/ios/Flutter/
+/ios/Runner/
+/docs/
+/PRODUCT.md
+/pubspec.lock
+*.iml
+*.log
+
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/build/
+**/.env
+**/.env.*
+**/payment-config.json
+**/node_modules/
+**/data/
+**/local.properties
+**/GeneratedPluginRegistrant.*
+**/flutter_export_environment.sh
+**/Generated.xcconfig
+**/ephemeral/
